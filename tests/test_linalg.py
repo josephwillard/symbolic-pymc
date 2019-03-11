@@ -2,6 +2,7 @@ import theano
 import theano.tensor as tt
 
 import numpy as np
+import pymc3 as pm
 
 from theano.gof.graph import inputs as tt_inputs
 
@@ -99,7 +100,6 @@ def test_normal_qr_transform():
     X = np.random.normal(10, 1, size=N)
     X = np.c_[np.ones(10), X, X * X]
     X_tt.tag.test_value = X
-
     V_tt = tt.vector('V')
     V_tt.tag.test_value = np.ones(N)
 
@@ -150,3 +150,24 @@ def test_normal_qr_transform():
     np.testing.assert_array_almost_equal(
         t_Q,
         Y_new.owner.inputs[0].owner.inputs[0].tag.test_value)
+
+def normal_qr_transform_pymc():
+    '''
+    This duplicates the test above and uses more pymc3 objects
+    '''
+    
+# def normal_qr_transform_pymc():
+#     '''
+#     Runs against basic pymc3 model to test.
+#     '''
+#     with pm.Model() as linear_model:
+#         weights = pm.Normal('weights', mu=0, sd=1)
+#         noise = pm.Gamma('noise', alpha=2, beta=1)
+#         mu = pm.Normal('mu', mu=0, sd=1)
+#         obs = pm.Normal('obs', mu=mu, sd=1, observed=np.random.randn(100))
+#         y_observed = pm.Normal('y_observed',
+#                                mu=mu,
+#                                sd=noise,
+#                                observed=np.random.randn(100))
+#         q = var()
+#         res, = run(1, q, normal_qr_transform(y_observed, q))
